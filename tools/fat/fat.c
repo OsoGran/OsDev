@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 /* DEFINES */ 
 typedef uint8_t bool;
@@ -33,7 +35,7 @@ typedef struct
 } __attribute__((packed)) BootSector;
 
 /* GLOBAL VARIABLES */ 
-BootSector g_BootSector
+BootSector g_BootSector;
 uint8_t* g_Fat = NULL;
 
 /* FUNCTIONS */
@@ -57,7 +59,7 @@ bool readBootSector(FILE* disk)
 bool readSectors(FILE* disk, uint32_t lba, uint32_t count, void* bufferOut)
 {
   bool ok = true;
-  ok = ok && (fseek(disk, lba * g_BootSector.BytesPerSector, SEEK_SET == 0);
+  ok = ok && (fseek(disk, lba * g_BootSector.BytesPerSector, SEEK_SET == 0));
   ok = ok && (fread(bufferOut, g_BootSector.BytesPerSector, count, disk) == count);
   return ok;
 }
@@ -71,7 +73,7 @@ bool readSectors(FILE* disk, uint32_t lba, uint32_t count, void* bufferOut)
 bool readFat(FILE* disk)
 {
   g_Fat = (uint8_t*) malloc(g_BootSector.SectorsPerFat * g_BootSector.BytesPerSector);
-  return readSectors(disk, g_BootSector.ReservedSectors, g_BootSector.SectorsPerFat, g_Fat)
+  return readSectors(disk, g_BootSector.ReservedSectors, g_BootSector.SectorsPerFat, g_Fat);
 }
 
 
