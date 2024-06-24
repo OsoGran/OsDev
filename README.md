@@ -1,1 +1,1 @@
-This OS is a work in progress implementation for personal practice with x86 processors. I intend to eventually build an open source ARINC 653 compliant RTOS.
+This OS is a personal toy OS for learning OS development for x86 processors.
