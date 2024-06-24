@@ -1,43 +1,24 @@
-org 0x0
-bits 16
+ bits 16
 
-%define ENDL 0x0D, 0x0A
+section _ENTRY class=CODE
 
-start:
-    ; print hello world message
-    mov si, msg_hello
-    call puts
+extern _cstart_
+global entry
 
-.halt:
-    cli
-    hlt
+entry: 
+  cli                                 
+  ; setup stack 
+  ; Small memory model, stack and data segment should be the same
+  mov ax, ds                      ; Data segment set up by stage 1, mov into ax
+  mov ss, ax                      ; Set stack segment to data segment
+  mov sp, 0                       ; Set base and stack pointer to 0
+  mov bp, sp
+  sti                             ; allow interrupts again       
 
-;
-; Prints a string to the screen
-; Params:
-;   - ds:si points to string
-;
-puts:
-    ; save registers we will modify
-    push si
-    push ax
-    push bx
+  ; expect boot drive in dl, send it as argument to cstart function
+  xor dh, dh                      ; clearing high byte of dx, set to 0
+  push dx                         ; push boot drive onto stack
+  call _cstart_
 
-.loop:
-    lodsb               ; loads next character in al
-    or al, al           ; verify if next character is null?
-    jz .done            ; jumps to the .done label if the zero flag is set 
-    
-    mov ah, 0x0E        ; write character in TTY Mode
-    mov bh, 0           ; set page number to 0
-    int 0x10            ; bios video interrupt
-
-    jmp .loop
-
-.done:
-    pop bx                ; popping registers off the stack and returns
-    pop ax
-    pop si
-    ret
-
-msg_hello: db 'Hello world from the kernel!', ENDL, 0       ; message to print using bios
+  cli                             ; cli and halt if return from _cstart_
+  hlt
